@@ -2,10 +2,7 @@ local print = function (text) general.log_to_console(tostring(text)) end
 
 local scope_line = {}
 
-scope_line.screen_side = {
-    x = renderer.get_center().x,
-    y = renderer.get_center().y,
-}
+scope_line.screen_side = renderer.get_center()
 
 scope_line.lib = {
 
@@ -23,7 +20,7 @@ scope_line.lib = {
         end
 
         local m_time = scope_line.lib.clamp(global_vars.get_frame_time() * (time * 175), 0.01, 1)
-        return ((target - start) * m_time + start)
+        return scope_line.lib.lerp(start, target, m_time)
     end,
 
 }
