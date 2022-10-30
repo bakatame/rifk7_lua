@@ -20,8 +20,9 @@ local color = function (color_r, color_g, color_b, color_a)
         function color_function:set(color, color_2, color_3, color_4)
     
             local color_r, color_g, color_b, color_a
-            
-            if type(color) == "table" then
+            if type(color) == "userdata" then
+                color_r, color_g, color_b, color_a = color:r(), color:g(), color:b(), color:a()
+            elseif type(color) == "table" then
                 if color.r ~= nil then
                     color_r, color_g, color_b, color_a = color.r, color.g, color.b, color.a
                 else
@@ -37,9 +38,25 @@ local color = function (color_r, color_g, color_b, color_a)
             self.g = color_g;
             self.b = color_b;
             self.a = color_a;
+            
         end
     
         function color_function.new(color_r, color_g, color_b, color_a)
+
+            if type(color_r) == "userdata" then
+                color_r, color_g, color_b, color_a = color_r:r(), color_r:g(), color_r:b(), color_r:a()
+            elseif type(color_r) == "table" then
+                if color_r.r ~= nil then
+                    color_r, color_g, color_b, color_a = color_r.r, color_r.g, color_r.b, color_r.a
+                else
+                    color_r, color_g, color_b, color_a = color_r[1], color_r[2], color_r[3], color_r[4]
+                end
+            elseif type(color_r) == "number" then
+                color_r, color_g, color_b, color_a = color_r, color_g, color_b, color_a
+            else
+                return
+            end
+
             return setmetatable({
                 r = color_r,
                 g = color_g,
