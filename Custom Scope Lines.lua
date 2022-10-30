@@ -69,7 +69,6 @@ scope_line.on_draw = function ()
     scope_line.data.scale = scope_line.lib.lerp2(scope_line.data.scale, (enable and Is_Scoped) and menu.get_slider("Scale") or 0, animation_smooth / 100)
     scope_line.data.offset = scope_line.lib.lerp2(scope_line.data.offset, (enable and Is_Scoped) and menu.get_slider("Size") or 0, animation_smooth / 100)
     scope_line.data.position = scope_line.lib.lerp2(scope_line.data.position, (enable and Is_Scoped) and menu.get_slider("Position") or 0, animation_smooth / 100)
-    print(scope_line.data.scale)
     local scale = scope_line.data.scale
     local position = scope_line.data.position
     local offset = scope_line.data.offset
