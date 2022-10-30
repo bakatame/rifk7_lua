@@ -1,37 +1,55 @@
-local color = (function ()
+local color = (function (color_r, color_g, color_b, color_a)
 
-    local color_function = {};
-    color_function.__index = color_function;
+    return (function ()
+        local color_function = {};
+        color_function.__index = color_function;
+    
+        function color_function:get()
+            return {
+                r = self.r,
+                g = self.g,
+                b = self.b,
+                a = self.a
+            }
+        end
+    
+        function color_function:unpack()
+            return self.r, self.g, self.b, self.a
+        end
+    
+        function color_function:set(color, color_2, color_3, color_4)
+    
+            local color_r, color_g, color_b, color_a
+            
+            if type(color) == "table" then
+                if color.r ~= nil then
+                    color_r, color_g, color_b, color_a = color.r, color.g, color.b, color.a
+                else
+                    color_r, color_g, color_b, color_a = color[1], color[2], color[3], color[4]
+                end
+            elseif type(color) == "number" then
+                color_r, color_g, color_b, color_a = color, color_2, color_3, color_4
+            else
+                return
+            end
+    
+            self.r = color_r;
+            self.g = color_g;
+            self.b = color_b;
+            self.a = color_a;
+        end
+    
+        function color_function.new(color_r, color_g, color_b, color_a)
+            return setmetatable({
+                r = color_r,
+                g = color_g,
+                b = color_b,
+                a = color_a,
+             }, color_function)
+        end
 
-    function color_function:get()
-        return {
-            r = self.r,
-            g = self.g,
-            b = self.b,
-            a = self.a
-        }
-    end
+        return color_function
 
-    function color_function:unpack()
-        return self.r, self.g, self.b, self.a
-    end
+    end)().new(color_r, color_g, color_b, color_a)
 
-    function color_function:set(color_r, color_g, color_b, color_a)
-        self.r = color_r;
-        self.g = color_g;
-        self.b = color_b;
-        self.a = color_a;
-    end
-
-    function color_function.new(color_r, color_g, color_b, color_a)
-        return setmetatable({
-            r = color_r,
-            g = color_g,
-            b = color_b,
-            a = color_a,
-         }, color_function)
-    end
-
-    return color_function
-
-end)()
+end)
