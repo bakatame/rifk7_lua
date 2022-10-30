@@ -1,4 +1,4 @@
-local color = (function (color_r, color_g, color_b, color_a)
+local color = function (color_r, color_g, color_b, color_a)
 
     return (function ()
         local color_function = {};
@@ -52,4 +52,4 @@ local color = (function (color_r, color_g, color_b, color_a)
 
     end)().new(color_r, color_g, color_b, color_a)
 
-end)
+end
