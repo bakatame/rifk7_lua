@@ -1,0 +1,37 @@
+local color = (function ()
+
+    local color_function = {};
+    color_function.__index = color_function;
+
+    function color_function:get()
+        return {
+            r = self.r,
+            g = self.g,
+            b = self.b,
+            a = self.a
+        }
+    end
+
+    function color_function:unpack()
+        return self.r, self.g, self.b, self.a
+    end
+
+    function color_function:set(color_r, color_g, color_b, color_a)
+        self.r = color_r;
+        self.g = color_g;
+        self.b = color_b;
+        self.a = color_a;
+    end
+
+    function color_function.new(color_r, color_g, color_b, color_a)
+        return setmetatable({
+            r = color_r,
+            g = color_g,
+            b = color_b,
+            a = color_a,
+         }, color_function)
+    end
+
+    return color_function
+
+end)()
