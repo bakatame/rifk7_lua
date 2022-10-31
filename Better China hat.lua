@@ -256,7 +256,6 @@ chinahat.func.on_draw = function ()
             color_g:set(r, g, b, 255)
         end
 
-        --Draw line and polygon
         if last_point ~= nil then
 
             local old_screen_point = last_point:to_screen()
@@ -271,7 +270,6 @@ chinahat.func.on_draw = function ()
 
         end
 
-        --Update
         last_point = new_point
     end
 
