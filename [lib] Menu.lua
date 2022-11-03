@@ -95,9 +95,9 @@ menu_lib.new = function(menu_type, menu_name, menu_value1, menu_value2, menu_val
         menu.add_separator(menu_name)
     elseif menu_type == "text" then
         menu.add_text(menu_name)
+        menu.set_text(menu_name, menu_value1)
     elseif menu_type == "checkbox" then
         if not menu_value1 or type(menu_value1) ~= "boolean" then menu_value1 = false end
-        print("1")
         menu.add_checkbox(menu_name, menu_value1)
     elseif menu_type == "slider" then
         if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 0 end
@@ -146,3 +146,7 @@ menu_lib.new = function(menu_type, menu_name, menu_value1, menu_value2, menu_val
 end
 
 return menu_lib
+
+--[[
+    <<Example>>
+]]
