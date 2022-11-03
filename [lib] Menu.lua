@@ -285,7 +285,11 @@ end
 
 --[[
     <<Example>>
-    
+
+    * Modified in r7_menu_example.lua
+    * Author: Smiley
+    * https://rifk7.com/index.php?threads/lua-api.199/
+
     local example_text = menu_lib.text("Example Text")
     local example_checkbox = menu_lib.checkbox("Example Checkbox", false)
     local example_slider = menu_lib.slider("Example Slider", 0, 0, 100)
