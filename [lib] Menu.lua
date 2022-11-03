@@ -10,7 +10,6 @@ local print = function (...)
     general.log_to_console(text) 
 end
 
-
 local combo_text = function (...)
 
     if not ... then return end
@@ -85,63 +84,200 @@ function menu_lib:set(menu_value1, menu_value2, menu_value3, menu_value4)
     
 end
 
-menu_lib.new = function(menu_type, menu_name, menu_value1, menu_value2, menu_value3, menu_value4, menu_value5)
+function menu_lib.separator(menu_name)
 
-    if not menu_type or not menu_name or type(menu_type) ~= "string" or type(menu_name) ~= "string" then
+    if not menu_name or type(menu_name) ~= "string" then
         return
     end
 
-    if menu_type == "separator" then
-        menu.add_separator(menu_name)
-    elseif menu_type == "text" then
-        menu.add_text(menu_name)
-        if menu_value1 then
-            menu.set_text(menu_name, menu_value1)
-        end
-    elseif menu_type == "checkbox" then
-        if not menu_value1 or type(menu_value1) ~= "boolean" then menu_value1 = false end
-        menu.add_checkbox(menu_name, menu_value1)
-    elseif menu_type == "slider" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 0 end
-        if not menu_value2 or type(menu_value2) ~= "number" then menu_value2 = 0 end
-        if not menu_value3 or type(menu_value3) ~= "number" then menu_value3 = 0 end
-        menu.add_slider(menu_name, menu_value1, menu_value2, menu_value3)
-    elseif menu_type == "combo" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 0 end
-        if not menu_value2 or type(menu_value2) ~= "table" then return end
-        menu.add_combo(menu_name, menu_value1, combo_text(menu_value2))
-    elseif menu_type == "keybind" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 0 end
-        if not menu_value2 or type(menu_value2) ~= "number" then menu_value2 = 0 end
-        if not menu_value3 or type(menu_value3) ~= "number" then menu_value3 = 0 end
-        menu.add_keybind(menu_name, menu_value1, menu_value2, menu_value3)
-    elseif menu_type == "flex_checkbox" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 0 end
-        if not menu_value2 or type(menu_value2) ~= "number" then menu_value2 = 0 end
-        menu.add_flex_checkbox(menu_name, menu_value1, menu_value2)
-    elseif menu_type == "colorpicker" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 255 end
-        if not menu_value2 or type(menu_value2) ~= "number" then menu_value2 = 255 end
-        if not menu_value3 or type(menu_value3) ~= "number" then menu_value3 = 255 end
-        if not menu_value4 or type(menu_value4) ~= "number" then menu_value4 = 255 end
-        if not menu_value5 or type(menu_value5) ~= "boolean" then menu_value5 = false end
-        menu.add_colorpicker(menu_name, menu_value1, menu_value2, menu_value3, menu_value4, menu_value5)
-    elseif menu_type == "second_colorpicker" then
-        if not menu_value1 or type(menu_value1) ~= "number" then menu_value1 = 255 end
-        if not menu_value2 or type(menu_value2) ~= "number" then menu_value2 = 255 end
-        if not menu_value3 or type(menu_value3) ~= "number" then menu_value3 = 255 end
-        if not menu_value4 or type(menu_value4) ~= "number" then menu_value4 = 255 end
-        if not menu_value5 or type(menu_value5) ~= "boolean" then menu_value5 = false end
-        menu.add_second_colorpicker(menu_name, menu_value1, menu_value2, menu_value3, menu_value4, menu_value5)
-    elseif menu_type == "multiselection" then
-        if not menu_value1 or type(menu_value1) ~= "table" then return end
-        menu.add_multiselection(menu_name, combo_text(menu_value1))
-    else
+    menu.add_separator(menu_name)
+
+    return setmetatable({
+        menu_type = "separator",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.text(menu_name, default_value)
+
+    if not menu_name or type(menu_name) ~= "string" then
         return
+    end
+
+    menu.add_text(menu_name)
+    if default_value then
+        menu.set_text(menu_name, default_value)
     end
 
     return setmetatable({
-        menu_type = menu_type,
+        menu_type = "text",
+        menu_name = menu_name,
+    },menu_lib)
+end
+
+function menu_lib.checkbox(menu_name, default_value)
+
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not default_value or type(default_value) ~= "boolean" then 
+        default_value = false 
+    end
+
+    menu.add_checkbox(menu_name, default_value)
+
+    return setmetatable({
+        menu_type = "checkbox",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.slider(menu_name, default_value, min_value, max_value)
+
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not default_value or type(default_value) ~= "number" then 
+        default_value = 0 
+    end
+
+    if not min_value or type(min_value) ~= "number" then 
+        min_value = 0 
+    end
+
+    if not max_value or type(max_value) ~= "number" then 
+        max_value = 0 
+    end
+
+    menu.add_slider(menu_name, default_value, min_value, max_value)
+
+    return setmetatable({
+        menu_type = "slider",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.combo(menu_name, default_value, combo_table)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not default_value or type(default_value) ~= "number" then 
+        default_value = 0 
+    end
+
+    if not combo_table or type(combo_table) ~= "table" then 
+        return
+    end
+
+    menu.add_combo(menu_name, default_value, combo_text(combo_table))
+
+    return setmetatable({
+        menu_type = "combo",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.multiselection(menu_name, combo_table)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not combo_table or type(combo_table) ~= "table" then 
+        return
+    end
+
+    menu.add_multiselection(menu_name, combo_text(combo_table))
+
+    return setmetatable({
+        menu_type = "multiselection",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.second_colorpicker(menu_name, r, g, b, a, alpha_slider)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not r or type(r) ~= "number" then r = 255 end
+    if not g or type(g) ~= "number" then g = 255 end
+    if not b or type(b) ~= "number" then b = 255 end
+    if not a or type(a) ~= "number" then a = 255 end
+    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false end
+
+    menu.add_second_colorpicker(menu_name, r, g, b, a, alpha_slider)
+
+    return setmetatable({
+        menu_type = "second_colorpicker",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.colorpicker(menu_name, r, g, b, a, alpha_slider)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not r or type(r) ~= "number" then r = 255 end
+    if not g or type(g) ~= "number" then g = 255 end
+    if not b or type(b) ~= "number" then b = 255 end
+    if not a or type(a) ~= "number" then a = 255 end
+    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false end
+
+    menu.add_colorpicker(menu_name, r, g, b, a, alpha_slider)
+
+    return setmetatable({
+        menu_type = "colorpicker",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.keybind(menu_name, default_button, mode, keybind_options)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not default_button or type(default_button) ~= "number" then default_button = 0 end
+    if not mode or type(mode) ~= "number" then mode = 0 end
+    if not keybind_options or type(keybind_options) ~= "number" then keybind_options = 0 end
+
+    menu.add_keybind(menu_name, default_button, mode, keybind_options)
+
+    return setmetatable({
+        menu_type = "keybind",
+        menu_name = menu_name,
+    },menu_lib)
+
+end
+
+function menu_lib.flex_checkbox(menu_name, default_button, mode)
+    
+    if not menu_name or type(menu_name) ~= "string" then
+        return
+    end
+
+    if not default_button or type(default_button) ~= "number" then default_button = 0 end
+    if not mode or type(mode) ~= "number" then mode = 0 end
+
+    menu.add_flex_checkbox(menu_name, default_button, mode)
+
+    return setmetatable({
+        menu_type = "flex_checkbox",
         menu_name = menu_name,
     },menu_lib)
 
@@ -150,34 +286,32 @@ end
 --[[
     <<Example>>
     
-    local example_text = menu_lib.new("text", "Example Text")
-    local example_checkbox = menu_lib.new("checkbox", "Example Checkbox", false)
-    local example_slider = menu_lib.new("slider", "Example Slider", 0, 0, 100)
-    local example_combo = menu_lib.new("combo", "Example Combo", 0, {"First Value", "Second Value", "Third Value"})
-    local example_multiselection = menu_lib.new("multiselection", "Example Multiselection", {"First Value", "Second Value", "Third Value"})
-    local example_flex_checkbox = menu_lib.new("flex_checkbox", "Example Flex Checkbox", 0, 0)
-    local example_keybind_full = menu_lib.new("keybind", "Example Keybind FULL", 0, 0, 0)
-    local example_flex_2modes = menu_lib.new("keybind", "Example Keybind 2 MODES", 0, 0, 1)
-    local example_flex_hold = menu_lib.new("keybind", "Example Keybind HOLD", 0, 0, 2)
-    local example_colorpicker = menu_lib.new("colorpicker", "Example Colorpicker value", 255, 255, 255, 255, false)
-    local example_colorpicker_text = menu_lib.new("text", "Example Colorpicker")
-    local example_colorpicker_alpha = menu_lib.new("colorpicker", "Example Colorpicker alpha", 255, 255, 255, 255, true)
-    local example_colorpicker_alpha_text = menu_lib.new("text", "Example Colorpicker with alpha")
-    local example_2_colorpickers_value = menu_lib.new("colorpicker", "Example 2 Colorpickers value", 255, 255, 255, 255, false)
-    local example_2_colorpickers_value2 = menu_lib.new("second_colorpicker", "Example 2 Colorpickers value2", 255, 255, 255, 255, true)
-    local example_colorpicker_3_text = menu_lib.new("text", "Example Colorpicker 3")
-    local example_separator = menu_lib.new("separator", "example_separator_1")
-    local dynamic_text_1 = menu_lib.new("text", "dynamic_text_1", "Checkbox Active: False")
-    local dynamic_text_2 = menu_lib.new("text", "dynamic_text_2", "Slider Value: 0")
-    local dynamic_text_3 = menu_lib.new("text", "dynamic_text_3", "Combo Value: 0")
-    local dynamic_text_4 = menu_lib.new("text", "dynamic_text_4", "MultiSelection 1. Item Active: False")
-    local dynamic_text_5 = menu_lib.new("text", "dynamic_text_5", "MultiSelection 2. Item Active: False")
-    local dynamic_text_6 = menu_lib.new("text", "dynamic_text_6", "MultiSelection 3. Item Active: False")
-
-
+    local example_text = menu_lib.text("Example Text")
+    local example_checkbox = menu_lib.checkbox("Example Checkbox", false)
+    local example_slider = menu_lib.slider("Example Slider", 0, 0, 100)
+    local example_combo = menu_lib.combo("Example Combo", 0, {"First Value", "Second Value", "Third Value"})
+    local example_multiselection = menu_lib.multiselection("Example Multiselection", {"First Value", "Second Value", "Third Value"})
+    local example_flex_checkbox = menu_lib.flex_checkbox("Example Flex Checkbox", 0, 0)
+    local example_keybind_full = menu_lib.keybind("Example Keybind FULL", 0, 0, 0)
+    local example_flex_2modes = menu_lib.keybind("Example Keybind 2 MODES", 0, 0, 1)
+    local example_flex_hold = menu_lib.keybind("Example Keybind HOLD", 0, 0, 2)
+    local example_colorpicker = menu_lib.colorpicker("Example Colorpicker value", 255, 255, 255, 255, false)
+    local example_colorpicker_text = menu_lib.text("Example Colorpicker")
+    local example_colorpicker_alpha = menu_lib.colorpicker("Example Colorpicker alpha", 255, 255, 255, 255, true)
+    local example_colorpicker_alpha_text = menu_lib.text("Example Colorpicker with alpha")
+    local example_2_colorpickers_value = menu_lib.colorpicker("Example 2 Colorpickers value", 255, 255, 255, 255, false)
+    local example_2_colorpickers_value2 = menu_lib.second_colorpicker("Example 2 Colorpickers value2", 255, 255, 255, 255, true)
+    local example_colorpicker_3_text = menu_lib.text("Example Colorpicker 3")
+    local example_separator = menu_lib.separator("example_separator_1")
+    local dynamic_text_1 = menu_lib.text("dynamic_text_1", "Checkbox Active: False")
+    local dynamic_text_2 = menu_lib.text("dynamic_text_2", "Slider Value: 0")
+    local dynamic_text_3 = menu_lib.text("dynamic_text_3", "Combo Value: 0")
+    local dynamic_text_4 = menu_lib.text("dynamic_text_4", "MultiSelection 1. Item Active: False")
+    local dynamic_text_5 = menu_lib.text("dynamic_text_5", "MultiSelection 2. Item Active: False")
+    local dynamic_text_6 = menu_lib.text("dynamic_text_6", "MultiSelection 3. Item Active: False")
 
     local function menu_checks()
-        
+
         dynamic_text_1:set(example_checkbox:get() and "Checkbox Active: True" or "Checkbox Active: False")
         dynamic_text_2:set("Slider Value: " .. example_slider:get())
         dynamic_text_3:set("Combo Value: " .. example_combo:get())
@@ -188,5 +322,5 @@ end
     end
 
     hooks.add_hook("on_draw", menu_checks);
-]]
 
+]]
