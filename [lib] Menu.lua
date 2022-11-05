@@ -11,42 +11,55 @@ local print = function (...)
 end
 
 local combo_text = function (...)
+    
+    if not ... then return; end
+    local check_type = type(...) == "table" and ... or {...};
 
-    if not ... then return end
-    local check_type = type(...) == "table" and ... or {...}
+    if #check_type == 0 then return; end
 
-    if #check_type == 0 then return end
-
-    local out_text = ""
+    local out_text = "";
     for index, value in ipairs(check_type) do
-        out_text = out_text .. value .. "\0"
+        out_text = out_text .. value .. "\0";
     end
 
-    out_text = out_text .. "\0"
-
-    return out_text
-
+    out_text = out_text .. "\0";
+    return out_text;
 end
 
-local menu_lib = {}
+local menu_lib = {};
 
-menu_lib.__index = menu_lib
+menu_lib.__index = menu_lib;
 
 function menu_lib:visible(bool)
-    if not self or not self.menu_name then return end
-    menu.override_visibility(self.menu_name, bool)
+    if not self or not self.menu_name then return; end
+    menu.override_visibility(self.menu_name, bool);
 end
 
 function menu_lib:get(value)
     
-    if not self or not self.menu_type or not self.menu_name then return end
+    if not self or not self.menu_type or not self.menu_name then return; end
 
     if self.menu_type == "second_colorpicker" then
-        return menu.get_colorpicker(self.menu_name)
+        return menu.get_colorpicker(self.menu_name);
+    elseif self.menu_type == "keybind" then
+        if value == "button" then
+            return menu.get_keybind_button(self.menu_name)
+        elseif value == "mode" then
+            return menu.get_keybind_mode(self.menu_name)
+        else
+            return menu.get_keybind(self.menu_name)
+        end
+    elseif self.menu_type == "flex_checkbox" then
+        if value == "button" then
+            return menu.get_flex_checkbox_button(self.menu_name)
+        elseif value == "mode" then
+            return menu.get_flex_checkbox_mode(self.menu_name)
+        else
+            return menu.get_flex_checkbox(self.menu_name)
+        end
     elseif self.menu_type == "multiselection" then
-        return menu.get_multiselection_item(self.menu_name, value)
     elseif menu["get_" .. self.menu_type] ~= nil then
-        return menu["get_" .. self.menu_type](self.menu_name)
+        return menu["get_" .. self.menu_type](self.menu_name);
     end
     
     return
@@ -55,31 +68,31 @@ end
 
 function menu_lib:set(menu_value1, menu_value2, menu_value3, menu_value4)
 
-    if not self or not self.menu_type or not self.menu_name then return end
-    if self.menu_type == "separator" then return end
+    if not self or not self.menu_type or not self.menu_name then return; end
+    if self.menu_type == "separator" then return; end
 
     if self.menu_type == "colorpicker" or self.menu_type == "second_colorpicker" then
-        menu.set_colorpicker(self.menu_name, menu_value1, menu_value2, menu_value3, menu_value4)
+        menu.set_colorpicker(self.menu_name, menu_value1, menu_value2, menu_value3, menu_value4);
     elseif self.menu_type == "keybind" then
         if menu_value1 then
-            menu.set_keybind_button(self.menu_name, menu_value1)
+            menu.set_keybind_button(self.menu_name, menu_value1);
         end
 
         if menu_value2 then
-            menu.set_keybind_mode(self.menu_name, menu_value2)
+            menu.set_keybind_mode(self.menu_name, menu_value2);
         end
     elseif self.menu_type == "flex_checkbox" then
         if menu_value1 then
-            menu.set_flex_checkbox_button(self.menu_name, menu_value1)
+            menu.set_flex_checkbox_button(self.menu_name, menu_value1);
         end
 
         if menu_value2 then
-            menu.set_flex_checkbox_mode(self.menu_name, menu_value2)
+            menu.set_flex_checkbox_mode(self.menu_name, menu_value2);
         end
     elseif self.menu_type == "multiselection" then
-        menu.set_multiselection(self.menu_name, menu_value1, menu_value2)
+        menu.set_multiselection(self.menu_name, menu_value1, menu_value2);
     elseif menu["set_" .. self.menu_type] ~= nil then
-        menu["set_" .. self.menu_type](self.menu_name, menu_value1)
+        menu["set_" .. self.menu_type](self.menu_name, menu_value1);
     end
     
 end
@@ -87,43 +100,43 @@ end
 function menu_lib.separator(menu_name)
 
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    menu.add_separator(menu_name)
+    menu.add_separator(menu_name);
 
     return setmetatable({
         menu_type = "separator",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.text(menu_name, default_value)
 
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    menu.add_text(menu_name)
+    menu.add_text(menu_name);
     if default_value then
-        menu.set_text(menu_name, default_value)
+        menu.set_text(menu_name, default_value);
     end
 
     return setmetatable({
         menu_type = "text",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 end
 
 function menu_lib.checkbox(menu_name, default_value)
 
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
     if not default_value or type(default_value) ~= "boolean" then 
-        default_value = false 
+        default_value = false;
     end
 
     menu.add_checkbox(menu_name, default_value)
@@ -131,157 +144,159 @@ function menu_lib.checkbox(menu_name, default_value)
     return setmetatable({
         menu_type = "checkbox",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.slider(menu_name, default_value, min_value, max_value)
 
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
     if not default_value or type(default_value) ~= "number" then 
-        default_value = 0 
+        default_value = 0;
     end
 
     if not min_value or type(min_value) ~= "number" then 
-        min_value = 0 
+        min_value = 0;
     end
 
     if not max_value or type(max_value) ~= "number" then 
-        max_value = 0 
+        max_value = 0;
     end
 
-    menu.add_slider(menu_name, default_value, min_value, max_value)
+    menu.add_slider(menu_name, default_value, min_value, max_value);
 
     return setmetatable({
         menu_type = "slider",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.combo(menu_name, default_value, combo_table)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    if not default_value or type(default_value) ~= "number" then 
-        default_value = 0 
+    if not default_value or type(default_value) ~= "number" then
+        default_value = 0;
     end
 
-    if not combo_table or type(combo_table) ~= "table" then 
-        return
+    if not combo_table or type(combo_table) ~= "table" then
+        return;
     end
 
-    menu.add_combo(menu_name, default_value, combo_text(combo_table))
+    menu.add_combo(menu_name, default_value, combo_text(combo_table));
 
     return setmetatable({
         menu_type = "combo",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.multiselection(menu_name, combo_table)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
     if not combo_table or type(combo_table) ~= "table" then 
-        return
+        return;
     end
 
-    menu.add_multiselection(menu_name, combo_text(combo_table))
+    menu.add_multiselection(menu_name, combo_text(combo_table));
 
     return setmetatable({
         menu_type = "multiselection",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.second_colorpicker(menu_name, r, g, b, a, alpha_slider)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    if not r or type(r) ~= "number" then r = 255 end
-    if not g or type(g) ~= "number" then g = 255 end
-    if not b or type(b) ~= "number" then b = 255 end
-    if not a or type(a) ~= "number" then a = 255 end
-    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false end
+    if not r or type(r) ~= "number" then r = 255; end
+    if not g or type(g) ~= "number" then g = 255; end
+    if not b or type(b) ~= "number" then b = 255; end
+    if not a or type(a) ~= "number" then a = 255; end
+    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false; end
 
-    menu.add_second_colorpicker(menu_name, r, g, b, a, alpha_slider)
+    menu.add_second_colorpicker(menu_name, r, g, b, a, alpha_slider);
 
     return setmetatable({
         menu_type = "second_colorpicker",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.colorpicker(menu_name, r, g, b, a, alpha_slider)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    if not r or type(r) ~= "number" then r = 255 end
-    if not g or type(g) ~= "number" then g = 255 end
-    if not b or type(b) ~= "number" then b = 255 end
-    if not a or type(a) ~= "number" then a = 255 end
-    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false end
+    if not r or type(r) ~= "number" then r = 255; end
+    if not g or type(g) ~= "number" then g = 255; end
+    if not b or type(b) ~= "number" then b = 255; end
+    if not a or type(a) ~= "number" then a = 255; end
+    if not alpha_slider or type(alpha_slider) ~= "boolean" then alpha_slider = false; end
 
-    menu.add_colorpicker(menu_name, r, g, b, a, alpha_slider)
+    menu.add_colorpicker(menu_name, r, g, b, a, alpha_slider);
 
     return setmetatable({
         menu_type = "colorpicker",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.keybind(menu_name, default_button, mode, keybind_options)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    if not default_button or type(default_button) ~= "number" then default_button = 0 end
-    if not mode or type(mode) ~= "number" then mode = 0 end
-    if not keybind_options or type(keybind_options) ~= "number" then keybind_options = 0 end
+    if not default_button or type(default_button) ~= "number" then default_button = 0; end
+    if not mode or type(mode) ~= "number" then mode = 0; end
+    if not keybind_options or type(keybind_options) ~= "number" then keybind_options = 0; end
 
-    menu.add_keybind(menu_name, default_button, mode, keybind_options)
+    menu.add_keybind(menu_name, default_button, mode, keybind_options);
 
     return setmetatable({
         menu_type = "keybind",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
 
 function menu_lib.flex_checkbox(menu_name, default_button, mode)
     
     if not menu_name or type(menu_name) ~= "string" then
-        return
+        return;
     end
 
-    if not default_button or type(default_button) ~= "number" then default_button = 0 end
-    if not mode or type(mode) ~= "number" then mode = 0 end
+    if not default_button or type(default_button) ~= "number" then default_button = 0; end
+    if not mode or type(mode) ~= "number" then mode = 0; end
 
     menu.add_flex_checkbox(menu_name, default_button, mode)
 
     return setmetatable({
         menu_type = "flex_checkbox",
         menu_name = menu_name,
-    },menu_lib)
+    },menu_lib);
 
 end
+
+return menu_lib
 
 --[[
     <<Example>>
