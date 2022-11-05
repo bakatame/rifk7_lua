@@ -6,9 +6,9 @@
 
 local print = function (...) local text = ""; if type(text) == "table" then for index, value in ipairs(...) do text = tostring(value) .. ", "; end; else text = tostring(...); end; general.log_to_console(text); end
 
-local hitbox = {};
+local hitbox_c = {};
 
-hitbox.lib = {
+hitbox_c.lib = {
 
     menu = (function ()
 
@@ -60,6 +60,7 @@ hitbox.lib = {
                     return menu.get_flex_checkbox(self.menu_name)
                 end
             elseif self.menu_type == "multiselection" then
+                return menu.get_multiselection_item(self.menu_name, value);
             elseif menu["get_" .. self.menu_type] ~= nil then
                 return menu["get_" .. self.menu_type](self.menu_name);
             end
@@ -328,7 +329,7 @@ hitbox.lib = {
 
 };
 
-hitbox.data = {
+hitbox_c.data = {
 
     hitbox = {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"},
     weapon = {"Auto", "Scout", "AWP", "Pistol", "Heavy", "Other"},
@@ -354,24 +355,25 @@ hitbox.data = {
 
 };
 
-hitbox.menu = {
+hitbox_c.menu = {
 
-    enable = hitbox.lib.menu.checkbox("Enable"),
-    keybinds_separator = hitbox.lib.menu.separator("keybinds_separator"),
-    override_hitboxes_keybind = hitbox.lib.menu.keybind("Override Hitboxes Keybind", 0, 0, 0),
-    override_multipoint_keybind = hitbox.lib.menu.keybind("Override Multipoints Keybind", 0, 0, 0),
-    weapon_separator = hitbox.lib.menu.separator("weapon_separator"),
-    weapon = hitbox.lib.menu.combo("Choose Weapons", 0, hitbox.data.weapon),
+    enable = hitbox_c.lib.menu.checkbox("Enable"),
+    keybinds_separator = hitbox_c.lib.menu.separator("keybinds_separator"),
+    override_hitboxes_keybind = hitbox_c.lib.menu.keybind("Override Hitboxes Keybind", 0, 0, 0),
+    override_multipoint_keybind = hitbox_c.lib.menu.keybind("Override Multipoints Keybind", 0, 0, 0),
+    weapon_separator = hitbox_c.lib.menu.separator("weapon_separator"),
+    weapon = hitbox_c.lib.menu.combo("Choose Weapons", 0, hitbox_c.data.weapon),
     setting = (function ()
         local out_table = {};
-        for index, value in ipairs(hitbox.data.weapon) do
+        for index, value in ipairs(hitbox_c.data.weapon) do
             out_table[index] = {
-                separator = hitbox.lib.menu.separator(value),
-                enable = hitbox.lib.menu.checkbox("Enable " .. value .. " Hitbox"),
-                hitbox = hitbox.lib.menu.multiselection("[" .. value .. "] Choose Hitboxes", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
-                multipoint = hitbox.lib.menu.multiselection("[" .. value .. "] Choose Multipoints", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
-                override_hitbox = hitbox.lib.menu.multiselection("[" .. value .. "] Choose Override Hitboxes", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
-                override_multipoint = hitbox.lib.menu.multiselection("[" .. value .. "] Choose Override Multipoints", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
+                separator = hitbox_c.lib.menu.separator(value),
+                text = value,
+                enable = hitbox_c.lib.menu.checkbox("Enable " .. value .. " Hitbox"),
+                hitbox = hitbox_c.lib.menu.multiselection("[" .. value .. "] Choose Hitboxes", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
+                multipoint = hitbox_c.lib.menu.multiselection("[" .. value .. "] Choose Multipoints", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
+                override_hitbox = hitbox_c.lib.menu.multiselection("[" .. value .. "] Choose Override Hitboxes", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
+                override_multipoint = hitbox_c.lib.menu.multiselection("[" .. value .. "] Choose Override Multipoints", {"Head", "Chest", "Stomach", "Pelvis", "Legs", "Toes", "Arms"}),
             }
         end
         return out_table;
@@ -379,90 +381,89 @@ hitbox.menu = {
 
 };
 
-hitbox.func = {
+hitbox_c.func = {
 
     on_paint = function ()
 
-        local enable = hitbox.menu.enable:get();
-        local weapon = hitbox.menu.weapon:get();
+        local enable = hitbox_c.menu.enable:get();
+        local weapon = hitbox_c.menu.weapon:get();
 
-        hitbox.menu.keybinds_separator:visible(enable);
-        hitbox.menu.override_hitboxes_keybind:visible(enable);
-        hitbox.menu.override_multipoint_keybind:visible(enable);
-        hitbox.menu.weapon_separator:visible(enable);
-        hitbox.menu.weapon:visible(enable);
+        hitbox_c.menu.keybinds_separator:visible(enable);
+        hitbox_c.menu.override_hitboxes_keybind:visible(enable);
+        hitbox_c.menu.override_multipoint_keybind:visible(enable);
+        hitbox_c.menu.weapon_separator:visible(enable);
+        hitbox_c.menu.weapon:visible(enable);
 
-        for index, value in ipairs(hitbox.data.weapon) do
+        for index, value in ipairs(hitbox_c.data.weapon) do
             local show = index == (weapon + 1);
             local show2 = enable and show;
-            hitbox.menu.setting[index].separator:visible(show2);
-            hitbox.menu.setting[index].enable:visible(show2);
-            hitbox.menu.setting[index].hitbox:visible(show2 and hitbox.menu.setting[index].enable:get());
-            hitbox.menu.setting[index].multipoint:visible(show2 and hitbox.menu.setting[index].enable:get());
-            hitbox.menu.setting[index].override_hitbox:visible(show2 and hitbox.menu.setting[index].enable:get());
-            hitbox.menu.setting[index].override_multipoint:visible(show2 and hitbox.menu.setting[index].enable:get());
+            hitbox_c.menu.setting[index].separator:visible(show2);
+            hitbox_c.menu.setting[index].enable:visible(show2);
+            hitbox_c.menu.setting[index].hitbox:visible(show2 and hitbox_c.menu.setting[index].enable:get());
+            hitbox_c.menu.setting[index].multipoint:visible(show2 and hitbox_c.menu.setting[index].enable:get());
+            hitbox_c.menu.setting[index].override_hitbox:visible(show2 and hitbox_c.menu.setting[index].enable:get());
+            hitbox_c.menu.setting[index].override_multipoint:visible(show2 and hitbox_c.menu.setting[index].enable:get());
         end
 
     end,
 
     createmove = function (cmd)
 
-        hitbox.data.check_enable = false;
+        hitbox_c.data.check_enable = false;
 
-        if not hitbox.menu.enable:get() then return; end
+        if not hitbox_c.menu.enable:get() then return; end
 
-        local index = hitbox.lib.get_weapon_index()
+        local index = hitbox_c.lib.get_weapon_index()
         if not index then return end
-        if not hitbox.menu.setting[index].enable:get() then return end
+        if not hitbox_c.menu.setting[index].enable:get() then return end
 
-        hitbox.data.check_enable = true;
+        hitbox_c.data.check_enable = true;
         
-        local is_hitbox_override = hitbox.menu.override_hitboxes_keybind:get("mode") ~= 3 and hitbox.menu.override_hitboxes_keybind:get();
-        local is_multipoint_override = hitbox.menu.override_multipoint_keybind:get("mode") ~= 3 and hitbox.menu.override_multipoint_keybind:get();
-
+        local is_hitbox_override = hitbox_c.menu.override_hitboxes_keybind:get("mode") ~= 3 and hitbox_c.menu.override_hitboxes_keybind:get();
+        local is_multipoint_override = hitbox_c.menu.override_multipoint_keybind:get("mode") ~= 3 and hitbox_c.menu.override_multipoint_keybind:get();
         local get_hitbox_item = function (value)
-            local return_value = is_hitbox_override and hitbox.menu.setting[index].override_hitbox:get(value) or hitbox.menu.setting[index].hitbox:get(value)
+            local return_value = is_hitbox_override and hitbox_c.menu.setting[index].override_hitbox:get(value) or hitbox_c.menu.setting[index].hitbox:get(value)
             return return_value
         end
 
         local get_multipoint_item = function (value)
-            local return_value = is_multipoint_override and hitbox.menu.setting[index].override_multipoint:get(value) or hitbox.menu.setting[index].multipoint:get(value)
+            local return_value = is_multipoint_override and hitbox_c.menu.setting[index].override_multipoint:get(value) or hitbox_c.menu.setting[index].multipoint:get(value)
             return return_value
         end
         
-        hitbox.data.check_hitbox.head = get_hitbox_item(0);
-        hitbox.data.check_hitbox.chest = get_hitbox_item(1);
-        hitbox.data.check_hitbox.stomach = get_hitbox_item(2);
-        hitbox.data.check_hitbox.pelvis = get_hitbox_item(3);
-        hitbox.data.check_hitbox.legs = get_hitbox_item(4);
-        hitbox.data.check_hitbox.toes = get_hitbox_item(5);
-        hitbox.data.check_hitbox.arms = get_hitbox_item(6);
-    
-        hitbox.data.check_multipoint.head = get_multipoint_item(0);
-        hitbox.data.check_multipoint.chest = get_multipoint_item(1);
-        hitbox.data.check_multipoint.stomach = get_multipoint_item(2);
-        hitbox.data.check_multipoint.pelvis = get_multipoint_item(3);
-        hitbox.data.check_multipoint.legs = get_multipoint_item(4);
-        hitbox.data.check_multipoint.toes = get_multipoint_item(5);
-        hitbox.data.check_multipoint.arms = get_multipoint_item(6);
+        hitbox_c.data.check_hitbox.head = get_hitbox_item(0);
+        hitbox_c.data.check_hitbox.chest = get_hitbox_item(1);
+        hitbox_c.data.check_hitbox.stomach = get_hitbox_item(2);
+        hitbox_c.data.check_hitbox.pelvis = get_hitbox_item(3);
+        hitbox_c.data.check_hitbox.legs = get_hitbox_item(4);
+        hitbox_c.data.check_hitbox.toes = get_hitbox_item(5);
+        hitbox_c.data.check_hitbox.arms = get_hitbox_item(6);
+
+        hitbox_c.data.check_multipoint.head = get_multipoint_item(0);
+        hitbox_c.data.check_multipoint.chest = get_multipoint_item(1);
+        hitbox_c.data.check_multipoint.stomach = get_multipoint_item(2);
+        hitbox_c.data.check_multipoint.pelvis = get_multipoint_item(3);
+        hitbox_c.data.check_multipoint.legs = get_multipoint_item(4);
+        hitbox_c.data.check_multipoint.toes = get_multipoint_item(5);
+        hitbox_c.data.check_multipoint.arms = get_multipoint_item(6);
 
     end,
 
     hitscan = function (context)
-
-        if not hitbox.data.check_enable then return end
+        
+        if not hitbox_c.data.check_enable then return end
         
         context.should_override = true;
-
+        
         local check_hitbox_table = {
             {
-                check = hitbox.data.check_hitbox.head,
+                check = hitbox_c.data.check_hitbox.head,
                 value = {
                     hitbox.head
                 }
             },
             {
-                check = hitbox.data.check_hitbox.chest,
+                check = hitbox_c.data.check_hitbox.chest,
                 value = {
                     hitbox.upper_chest,
                     hitbox.chest,
@@ -470,19 +471,19 @@ hitbox.func = {
                 }
             },
             {
-                check = hitbox.data.check_hitbox.stomach,
+                check = hitbox_c.data.check_hitbox.stomach,
                 value = {
                     hitbox.stomach
                 }
             },
             {
-                check = hitbox.data.check_hitbox.pelvis,
+                check = hitbox_c.data.check_hitbox.pelvis,
                 value = {
                     hitbox.pelvis
                 }
             },
             {
-                check = hitbox.data.check_hitbox.legs,
+                check = hitbox_c.data.check_hitbox.legs,
                 value = {
                     hitbox.left_thigh,
                     hitbox.right_thigh,
@@ -491,14 +492,14 @@ hitbox.func = {
                 }
             },
             {
-                check = hitbox.data.check_hitbox.toes,
+                check = hitbox_c.data.check_hitbox.toes,
                 value = {
                     hitbox.right_foot,
                     hitbox.left_foot
                 }
             },
             {
-                check = hitbox.data.check_hitbox.arms,
+                check = hitbox_c.data.check_hitbox.arms,
                 value = {
                     hitbox.left_upper_arm,
                     hitbox.right_upper_arm
@@ -509,6 +510,7 @@ hitbox.func = {
         for index, check_value in ipairs(check_hitbox_table) do
             if check_value.check then
                 for index2, value in ipairs(check_value.value) do
+                    print(value)
                     hitscan.add_hitbox(value);
                 end
             end
@@ -518,18 +520,18 @@ hitbox.func = {
 
     multipoints = function (context)
 
-        if not hitbox.data.check_enable then return end
+        if not hitbox_c.data.check_enable then return end
 
         context.should_override = true;
         
         local check_table = {
-            (context.hitbox == hitbox.head and hitbox.data.check_multipoint.head),
-            ((context.hitbox == hitbox.upper_chest or context.hitbox == hitbox.chest or context.hitbox == hitbox.lower_chest) and hitbox.data.check_multipoint.chest),
-            (context.hitbox == hitbox.stomach and hitbox.data.check_multipoint.stomach),
-            (context.hitbox == hitbox.pelvis and hitbox.data.check_multipoint.pelvis),
-            ((context.hitbox == hitbox.left_thigh or context.hitbox == hitbox.right_thigh or context.hitbox == hitbox.left_calf or context.hitbox == hitbox.right_calf) and hitbox.data.check_multipoint.legs),
-            ((context.hitbox == hitbox.right_foot or context.hitbox == hitbox.left_foot) and hitbox.data.check_multipoint.toes),
-            ((context.hitbox == hitbox.left_upper_arm or context.hitbox == hitbox.right_upper_arm) and hitbox.data.check_multipoint.arms),
+            (context.hitbox == hitbox.head and hitbox_c.data.check_multipoint.head),
+            ((context.hitbox == hitbox.upper_chest or context.hitbox == hitbox.chest or context.hitbox == hitbox.lower_chest) and hitbox_c.data.check_multipoint.chest),
+            (context.hitbox == hitbox.stomach and hitbox_c.data.check_multipoint.stomach),
+            (context.hitbox == hitbox.pelvis and hitbox_c.data.check_multipoint.pelvis),
+            ((context.hitbox == hitbox.left_thigh or context.hitbox == hitbox.right_thigh or context.hitbox == hitbox.left_calf or context.hitbox == hitbox.right_calf) and hitbox_c.data.check_multipoint.legs),
+            ((context.hitbox == hitbox.right_foot or context.hitbox == hitbox.left_foot) and hitbox_c.data.check_multipoint.toes),
+            ((context.hitbox == hitbox.left_upper_arm or context.hitbox == hitbox.right_upper_arm) and hitbox_c.data.check_multipoint.arms),
         }
 
         for index, value in ipairs(check_table) do
@@ -542,18 +544,18 @@ hitbox.func = {
     end
 };
 
-hitbox.callbacks = {
-    on_paint = hitbox.func.on_paint,
-    on_createmove = hitbox.func.createmove,
-    on_hitscan = hitbox.func.hitscan,
-    on_multipoints = hitbox.func.multipoints,
+hitbox_c.callbacks = {
+    on_paint = hitbox_c.func.on_paint,
+    on_createmove = hitbox_c.func.createmove,
+    on_hitscan = hitbox_c.func.hitscan,
+    on_multipoints = hitbox_c.func.multipoints,
 }
 
-hitbox.init = function ()
-    hitbox.func.on_paint()
-    for key, value in pairs(hitbox.callbacks) do
+hitbox_c.init = function ()
+    hitbox_c.func.on_paint()
+    for key, value in pairs(hitbox_c.callbacks) do
         hooks.add_hook(key, value);
     end
 end;
 
-hitbox.init();
+hitbox_c.init();
