@@ -58,6 +58,7 @@ function menu_lib:get(value)
             return menu.get_flex_checkbox(self.menu_name)
         end
     elseif self.menu_type == "multiselection" then
+        return menu.get_multiselection_item(self.menu_name, value);
     elseif menu["get_" .. self.menu_type] ~= nil then
         return menu["get_" .. self.menu_type](self.menu_name);
     end
