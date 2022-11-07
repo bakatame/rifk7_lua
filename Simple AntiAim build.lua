@@ -18,6 +18,7 @@ script.cache = {
 }
 
 script.menu_table = {
+	
 	mode = {
 		"Default",
 		"Standing",
@@ -187,7 +188,7 @@ script.menu_setting = function ()
 		menu.override_visibility("[" .. value .. "] Desync", show2 and menu.get_combo("[" .. value .. "] Real Mode") == 0)
 		menu.override_visibility("[" .. value .. "] Real Min", show2 and (menu.get_combo("[" .. value .. "] Real Mode") == 1 or menu.get_combo("[" .. value .. "] Real Mode") == 2))
 		menu.override_visibility("[" .. value .. "] Real Max", show2 and menu.get_combo("[" .. value .. "] Real Mode") ~= 0)
-		menu.override_visibility("[" .. value .. "] Jitter Delay", show2 and menu.get_combo("[" .. value .. "] Real Mode") ~= 0)
+		menu.override_visibility("[" .. value .. "] Jitter Delay", show2 and (menu.get_combo("[" .. value .. "] Real Mode") ~= 0 or menu.get_combo("[" .. value .. "] Fake Mode") ~= 0))
 	end
 
 end
@@ -264,6 +265,5 @@ for key, value in pairs(callback_table) do
 	else
 		hooks.add_hook(key, value);
 	end
-	
 end
 
