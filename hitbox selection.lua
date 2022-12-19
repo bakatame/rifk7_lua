@@ -510,7 +510,6 @@ hitbox_c.func = {
         for index, check_value in ipairs(check_hitbox_table) do
             if check_value.check then
                 for index2, value in ipairs(check_value.value) do
-                    print(value)
                     hitscan.add_hitbox(value);
                 end
             end
@@ -537,7 +536,7 @@ hitbox_c.func = {
         for index, value in ipairs(check_table) do
             if value then
                 context.should_multipoint_hitbox = true;
-                return;
+                break;
             end
         end
 
