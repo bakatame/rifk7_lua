@@ -1,3 +1,11 @@
+-- Thanks Smiley!!! > <
+local enable_hat = menu.add_checkbox("Enable China hat", false)
+local color_hat = menu.add_colorpicker("Hat Color", 255, 255, 255, 255, false)
+local rgb_hat = menu.add_checkbox("Hat RGB", false)
+local size_hat = menu.add_slider("Hat Size", 12, 1, 20)
+local extra_z_hat = menu.add_slider("Hat Position Z", 1, 0, 20)
+local height_hat = menu.add_slider("Hat Height", 7, 0, 20)
+
 local print = function (...) local text = "" if type(text) == "table" then for index, value in ipairs(...) do text = tostring(value) .. ", " end else text = tostring(...) end general.log_to_console(text) end
 
 local chinahat = {}
@@ -7,44 +15,9 @@ chinahat.lib = {
 
     vector = function (x, y ,z)
         return (function ()
-
             local vector_table = {}
             vector_table.__index = vector_table
-
-            vector_table.__add = function (a, b)
-
-                local x = a.x + b.x
-                local y = a.y + b.y
-                local z = a.z + b.z
-                return vector_table.new(x, y, z)
-
-            end
-        
-            vector_table.__sub = function (a, b)
-
-                local x = a.x - b.x
-                local y = a.y - b.y
-                local z = a.z - b.z
-                return vector_table.new(x, y, z)
-
-            end
-
-            vector_table.__mul = function (a, b)
-                local x = a.x * b.x
-                local y = a.y * b.y
-                local z = a.z * b.z
-                return vector_table.new(x, y, z)
-            end
-    
-            vector_table.__div = function (a, b)
-
-                local x = a.x / b.x
-                local y = a.y / b.y
-                local z = a.z / b.z
-                return vector_table.new(x, y, z)
-
-            end
-    
+            
             function vector_table:set(x, y, z)
     
                 if not z then
@@ -58,15 +31,15 @@ chinahat.lib = {
             end
     
             function vector_table:get()
-        
+    
                 return {
                     x = self.x,
                     y = self.y,
                     z = self.z
                 }
-    
+
             end
-            
+
             function vector_table:unpack()
                 return self.x, self.y, self.z
             end
@@ -171,108 +144,58 @@ chinahat.lib = {
     
     end,
 
-    hsv_to_rgb = function (h, s, v)
-        local r, g, b
-
-        local i = math.floor(h * 6);
-        local f = h * 6 - i;
-        local p = v * (1 - s);
-        local q = v * (1 - f * s);
-        local t = v * (1 - (1 - f) * s);
-
-        i = i % 6
-
-        if i == 0 then r, g, b = v, t, p
-        elseif i == 1 then r, g, b = q, v, p
-        elseif i == 2 then r, g, b = p, v, t
-        elseif i == 3 then r, g, b = p, q, v
-        elseif i == 4 then r, g, b = t, p, v
-        elseif i == 5 then r, g, b = v, p, q
-        end
-        
-        return chinahat.lib.color(r * 255, g * 255, b * 255, 255)
+    rgb = function()
+        local r = math.floor(math.sin(global_vars.get_real_time() * 4) * 90 + 165)
+        local g = math.floor(math.sin(global_vars.get_real_time() * 4 + 2) * 90 + 165)
+        local b = math.floor(math.sin(global_vars.get_real_time() * 4 + 4) * 90 + 165)
+        return chinahat.lib.color(r, g, b, 255)
     end,
 
-    renderer_triangle = function(v2_A, v2_B, v2_C, r, g, b, a)
-        local function i(j,k,l)
-            local m=(k.y-j.y)*(l.x-k.x)-(k.x-j.x)*(l.y-k.y)
-            if m<0 then return true end
-            return false
-        end
-        if i(v2_A,v2_B,v2_C) then renderer.draw_triangle_filled(v2_A.x,v2_A.y,v2_B.x,v2_B.y,v2_C.x,v2_C.y,r,g,b,a)
-        elseif i(v2_A,v2_C,v2_B) then renderer.draw_triangle_filled(v2_A.x,v2_A.y,v2_C.x,v2_C.y,v2_B.x,v2_B.y,r,g,b,a)
-        elseif i(v2_B,v2_C,v2_A) then renderer.draw_triangle_filled(v2_B.x,v2_B.y,v2_C.x,v2_C.y,v2_A.x,v2_A.y,r,g,b,a)
-        elseif i(v2_B,v2_A,v2_C) then renderer.draw_triangle_filled(v2_B.x,v2_B.y,v2_A.x,v2_A.y,v2_C.x,v2_C.y,r,g,b,a)
-        elseif i(v2_C,v2_A,v2_B) then renderer.draw_triangle_filled(v2_C.x,v2_C.y,v2_A.x,v2_A.y,v2_B.x,v2_B.y,r,g,b,a)
-        else renderer.draw_triangle_filled(v2_C.x,v2_C.y,v2_B.x,v2_B.y,v2_A.x,v2_A.y,r,g,b,a)end
-    end,
-    
 }
 
-chinahat.menu = function ()
-    menu.add_checkbox("Enable China hat", false)
-    menu.add_colorpicker("Hat Color", 0, 255, 255, 255, false)
-    menu.add_checkbox("Hat Gradient", false)
-    menu.add_slider("Hat Color Speed", 5, 1, 10)
-end chinahat.menu()
-
 chinahat.func.on_draw = function ()
-    
-    if not menu.get_checkbox("Enable China hat") then return end
-    
+
+    if not menu.get(enable_hat):get_bool() then return end
+
     local local_player = engine.get_local_player()
 	if not local_player or not engine.is_ingame() and not engine.is_connected() or engine.get_local_player():get_netvar_int("m_lifeState") ~= 0 then return end
 
     if not input.is_cam_in_thirdperson() then return end
-    
+
+    local real_color
+    local rgb = chinahat.lib.rgb()
+    local accent = menu.get(color_hat):get_color()
+    local size = menu.get(size_hat):get_float()
+    local extra_z = menu.get(extra_z_hat):get_float()
+
     local headpos = esp_info.get_hitbox_position(local_player:get_index(), hitbox.head)
-    if not headpos.x then return end
-    local origin = chinahat.lib.vector(headpos.x, headpos.y, headpos.z)
-    if not origin.x then return end
 
-    local size = 10
-    local last_point = nil
+    local high_pos = chinahat.lib.vector(headpos.x, headpos.y, headpos.z + menu.get(height_hat):get_float())
+    local w2s = high_pos:to_screen()
+    
+    if menu.get(rgb_hat):get_bool() then
+        real_color = chinahat.lib.color(rgb.r, rgb.g, rgb.b, 255)
+    else
+        real_color = chinahat.lib.color(accent)
+    end
 
-    local gradient_g = menu.get_checkbox("Hat Gradient")
-    local color_g = chinahat.lib.color(menu.get_colorpicker("Hat Color"))
-    local speed_g = menu.get_slider("Hat Color Speed")
+    if w2s then
 
-    for i = 0, 360, 5 do
+        for i = 1, 360, 1 do
 
-        local new_point = chinahat.lib.vector( --Rotate point
-            origin.x - (math.sin(math.rad(i)) * size),
-            origin.y - (math.cos(math.rad(i)) * size),
-            origin.z
-        )
+            local current_head_position = chinahat.lib.vector(headpos.x + math.sin(math.rad(i)) * size, headpos.y + math.cos(math.rad(i)) * size, headpos.z + extra_z)
+            local current_position_w2s = current_head_position:to_screen()
 
-        if (gradient_g) then
-            local hue_offset = 0
+            local old_position = chinahat.lib.vector(headpos.x + math.sin(math.rad(i - 1)) * size, headpos.y + math.cos(math.rad(i - 1)) * size, headpos.z + extra_z)
+            local old_position_w2s = old_position:to_screen()
 
-            hue_offset = ((global_vars.get_real_time() * (speed_g * 50)) + i) % 360
-            hue_offset = math.min(360, math.max(0, hue_offset))
-
-            local r, g, b = chinahat.lib.hsv_to_rgb(hue_offset / 360, 1, 1)
-
-            color_g:set(r, g, b, 255)
-        end
-
-        if last_point ~= nil then
-
-            local old_screen_point = last_point:to_screen()
-            local new_screen_point = new_point:to_screen()
-            local new_origin = origin + chinahat.lib.vector(0, 0, 8)
-            local origin_screen_point = new_origin:to_screen()
-
-            if old_screen_point.x ~= nil and new_screen_point.x ~= nil and origin_screen_point.x ~= nil then
-                chinahat.lib.renderer_triangle(old_screen_point, new_screen_point , origin_screen_point, color_g.r, color_g.g, color_g.b, 50)     
-                renderer.draw_line(old_screen_point.x, old_screen_point.y, new_screen_point.x, new_screen_point.y, color_g.r, color_g.g, color_g.b, 255, 1)
-            end
+            renderer.draw_line(current_position_w2s.x, current_position_w2s.y, old_position_w2s.x, old_position_w2s.y, real_color.r, real_color.g, real_color.b, real_color.a, 1)
+            renderer.draw_line(current_position_w2s.x, current_position_w2s.y, w2s.x, w2s.y, real_color.r, real_color.g, real_color.b, real_color.a, 1)
 
         end
 
-        last_point = new_point
     end
 
 end
 
-hooks.add_hook("on_draw", chinahat.func.on_draw)
+hooks.add_callback("on_draw", chinahat.func.on_draw)

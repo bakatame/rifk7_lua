@@ -1,6 +1,10 @@
 -- A gift for SkuLz
 -- (Forum Emoji) :uidissue:
 
+-- Sorry SkuLz
+-- I didn't think he was good enough, so I deleted him
+-- I hope you won't be sad because of this :(
+
 local print = function (...) local text = "" if type(text) == "table" then for index, value in ipairs(...) do text = tostring(value) .. ", " end else text = tostring(...) end general.log_to_console(text) end
 
 local skulz = {}

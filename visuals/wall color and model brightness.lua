@@ -9,11 +9,9 @@ script.ref = {
     r_modelAmbientMin = general.get_convar("r_modelAmbientMin"),
 }
 
-script.menu = function ()
-    menu.add_checkbox("wall color", false)
-    menu.add_colorpicker("wall effect color", 110, 205, 255, 255, true)
-    menu.add_slider("Min model brightness", 0, 0, 1000)
-end script.menu()
+local enable = menu.add_checkbox("wall color", false)
+local color = menu.add_colorpicker("wall effect color", 110, 205, 255, 255, true)
+local brightness = menu.add_slider("Min model brightness", 0, 0, 1000)
 
 script.data = {
     wallcolor_old = false,
@@ -31,13 +29,13 @@ script.func = {
             return
         end
         
-        local wallcolor = menu.get_checkbox("wall color")
+        local wallcolor = menu.get(enable):get_bool()
         if wallcolor or script.data.wallcolor_old then
             
             if wallcolor then
                 
                 local r_res, g_res, b_res
-                local bloom_wall_color = menu.get_colorpicker("wall effect color")
+                local bloom_wall_color = menu.get(color):get_c_color()
                 local alpha_temp = bloom_wall_color:a() / 128 - 1
                 local wall_color_r, wall_color_g, wall_color_b = bloom_wall_color:r() / 255, bloom_wall_color:g() / 255, bloom_wall_color:b() / 255
                 if alpha_temp > 0 then
@@ -64,7 +62,7 @@ script.func = {
         script.data.wallcolor_old = wallcolor
         script.data.post_processing_old = true
         
-        local model_ambient_min = menu.get_slider("Min model brightness")
+        local model_ambient_min = menu.get(brightness):get_float()
         if model_ambient_min > 0 or (script.data.model_ambient_min_old ~= nil and script.data.model_ambient_min_old > 0) then
             if script.ref.r_modelAmbientMin:get_float() ~= model_ambient_min * 0.05 then
                 script.ref.r_modelAmbientMin:set_float(model_ambient_min * 0.05)
@@ -99,8 +97,8 @@ local callback_table = {
 
 for key, value in pairs(callback_table) do
 	if key == "on_unload" then
-		hooks.on_lua_unload(value);
+		hooks.add_lua_unload_callback(value);
 	else
-		hooks.add_hook(key, value);
+		hooks.add_callback(key, value);
 	end
 end
