@@ -557,7 +557,7 @@ script.on_createmove_pre_antiaim = function (cmd)
 	local fake_mode = script.menu.custom[index].fake_mode:get()
 	local fake_max_value = (fake_mode == 1 or fake_mode == 2) and script.menu.custom[index].fake_max:get() or script.menu.custom[index].fake_max_2:get()
 
-	menu_antiaim.set_pitch(script.menu.custom[index].fake_max:get())
+	menu_antiaim.set_pitch(script.menu.custom[index].pitch:get())
 	menu_antiaim.set_viewangles(script.menu.custom[index].viewangles:get())
 	menu_antiaim.set_max_fov(script.menu.custom[index].fov:get())
 	menu_antiaim.set_yaw_offset(script.menu.custom[index].yaw:get())
